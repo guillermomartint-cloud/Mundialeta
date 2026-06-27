@@ -1,6 +1,558 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta http-equiv="refresh" content="0; url=mundialeta_ranking.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏆 Mundialeta — 16avos del Mundial</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --verde: #1a472a;
+    --verde-claro: #2d6a4f;
+    --dorado: #d4af37;
+    --dorado-claro: #f0d060;
+    --crema: #f5f0e8;
+    --gris: #8a9a8a;
+    --negro: #0a0f0a;
+    --rojo: #e63946;
+    --card-bg: #162a1e;
+    --card-border: rgba(212,175,55,0.15);
+  }
+  body { background: var(--negro); color: var(--crema); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+  .hero {
+    background: linear-gradient(160deg, #060d08 0%, var(--verde) 55%, #0d1f10 100%);
+    padding: 44px 20px 36px; text-align: center;
+    border-bottom: 3px solid var(--dorado); position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '16'; position: absolute;
+    font-family: 'Bebas Neue', sans-serif; font-size: 280px;
+    color: rgba(212,175,55,0.04); top: 50%; left: 50%;
+    transform: translate(-50%, -50%); pointer-events: none; letter-spacing: -10px;
+  }
+  .hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--dorado); margin-bottom: 10px; position: relative; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(54px, 16vw, 108px); line-height: 0.88; color: var(--crema); position: relative; }
+  .hero-title span { color: var(--dorado); }
+  .hero-sub { font-size: 12px; color: var(--gris); margin-top: 14px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; position: relative; }
+
+  .container { max-width: 600px; margin: 0 auto; padding: 0 16px 60px; }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--dorado);
+    margin: 32px 0 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--dorado), transparent); }
+
+  .card { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 10px; overflow: hidden; }
+  .card-inner { padding: 16px; }
+
+  .q-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gris); margin-bottom: 6px; display: block; }
+  .q-text { font-size: 15px; font-weight: 700; color: var(--crema); line-height: 1.4; margin-bottom: 4px; }
+  .q-hint { font-size: 12px; color: var(--gris); font-style: italic; line-height: 1.4; margin-bottom: 12px; }
+  .q-explain {
+    background: rgba(212,175,55,0.06); border-left: 3px solid var(--dorado);
+    border-radius: 0 4px 4px 0; padding: 10px 12px; margin-bottom: 12px;
+    font-size: 12px; color: rgba(245,240,232,0.75); line-height: 1.5;
+  }
+  .q-explain strong { color: var(--dorado-claro); }
+
+  input[type="number"], input[type="text"], select {
+    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px; padding: 12px 14px; color: var(--crema); font-size: 16px;
+    font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input:focus, select:focus { border-color: var(--dorado); }
+  select option { background: #1a2a1a; color: var(--crema); }
+  select { cursor: pointer; }
+
+  .toggle-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toggle-btn {
+    padding: 11px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03); color: var(--gris); font-size: 13px;
+    font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+    font-family: 'Inter', sans-serif;
+  }
+  .toggle-btn:hover { border-color: rgba(212,175,55,0.4); color: var(--crema); }
+  .toggle-btn.active { background: rgba(212,175,55,0.15); border-color: var(--dorado); color: var(--crema); }
+
+  .pts-hint { font-size: 11px; color: var(--gris); margin-top: 6px; }
+  .pts-hint span { color: var(--dorado); font-weight: 700; }
+
+  /* Nombre field */
+  .nombre-card { background: linear-gradient(135deg, #1a2a1a, #111a11); border-color: rgba(212,175,55,0.3); }
+
+  /* Bombacha card */
+  .bombacha-card { border-color: rgba(230,57,70,0.2); }
+  .bombacha-hint-box {
+    background: rgba(230,57,70,0.08); border: 1px solid rgba(230,57,70,0.2);
+    border-radius: 6px; padding: 12px 14px; margin-bottom: 12px;
+    font-size: 13px; color: rgba(245,240,232,0.8); line-height: 1.5;
+  }
+  .bombacha-hint-box strong { color: #e84060; }
+
+  /* Sobreviviente card */
+  .sobreviviente-card { border-color: rgba(116,192,116,0.2); }
+  .sobreviviente-explain {
+    background: rgba(116,192,116,0.06); border-left: 3px solid #6ec96e;
+    border-radius: 0 4px 4px 0; padding: 10px 12px; margin-bottom: 12px;
+    font-size: 12px; color: rgba(245,240,232,0.75); line-height: 1.5;
+  }
+  .sobreviviente-explain strong { color: #6ec96e; }
+
+  .submit-btn {
+    width: 100%; padding: 18px; background: var(--dorado); border: none; border-radius: 6px;
+    color: var(--negro); font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px;
+    cursor: pointer; margin-top: 24px; transition: background 0.2s; font-weight: 400;
+  }
+  .submit-btn:hover { background: var(--dorado-claro); }
+  .submit-btn:disabled { background: var(--verde-claro); color: rgba(255,255,255,0.4); cursor: not-allowed; }
+
+  .success-banner {
+    background: rgba(45,106,79,0.15); border: 1px solid rgba(45,106,79,0.4);
+    border-radius: 8px; padding: 24px; text-align: center; margin-top: 24px; display: none;
+  }
+  .success-banner .icon { font-size: 48px; margin-bottom: 12px; }
+  .success-banner .titulo { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: #6ecf96; letter-spacing: 2px; }
+  .success-banner .sub { font-size: 13px; color: var(--gris); margin-top: 8px; line-height: 1.6; }
+
+  .cerrado-banner {
+    background: rgba(230,57,70,0.08); border: 1px solid rgba(230,57,70,0.3);
+    border-radius: 8px; padding: 24px; text-align: center; margin-top: 24px; display: none;
+  }
+  .cerrado-banner .titulo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--rojo); letter-spacing: 2px; }
+
+  .ya-cargado {
+    background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.25);
+    border-radius: 6px; padding: 12px 16px; text-align: center; margin-top: 16px; display: none;
+    font-size: 13px; color: var(--dorado); font-weight: 600;
+  }
+
+  .loading { text-align: center; padding: 48px; color: var(--gris); font-size: 14px; }
+  .footer { text-align: center; padding: 24px 0 0; font-size: 11px; color: var(--gris); letter-spacing: 1px; }
+
+  .selecciones-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  }
+  .selec-btn {
+    padding: 10px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03); color: rgba(245,240,232,0.7); font-size: 12px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center;
+    font-family: 'Inter', sans-serif; line-height: 1.3;
+  }
+  .selec-btn:hover { border-color: rgba(110,201,110,0.4); color: var(--crema); }
+  .selec-btn.active { background: rgba(110,201,110,0.15); border-color: #6ec96e; color: var(--crema); }
+  .selec-btn.sobreviviente-active { background: rgba(110,201,110,0.15); border-color: #6ec96e; color: var(--crema); }
+
+  .jugador-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  }
+  .jugador-btn {
+    padding: 9px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03); color: rgba(245,240,232,0.7); font-size: 12px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: left;
+    font-family: 'Inter', sans-serif; line-height: 1.3;
+  }
+  .jugador-btn:hover { border-color: rgba(212,175,55,0.4); color: var(--crema); }
+  .jugador-btn.active { background: rgba(212,175,55,0.15); border-color: var(--dorado); color: var(--crema); }
+  .jugador-pos { font-size: 9px; color: var(--gris); text-transform: uppercase; letter-spacing: 1px; display: block; }
+
+  .divider { height: 1px; background: rgba(255,255,255,0.05); margin: 8px 0; }
+  .pos-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gris); padding: 4px 0 6px; }
+</style>
 </head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Mundialeta Familiar · Mundial 2026</div>
+  <div class="hero-title">16<span>avos</span></div>
+  <div class="hero-sub">Cargá tus pronósticos</div>
+</div>
+
+<div class="container">
+  <div id="loading" class="loading">Cargando...</div>
+  <div id="cerrado-banner" class="cerrado-banner" style="display:none">
+    <div style="font-size:36px; margin-bottom:8px">🔒</div>
+    <div class="titulo">Pronósticos cerrados</div>
+    <div style="font-size:13px; color:var(--gris); margin-top:6px">Ya no se pueden modificar. ¡Esperá los resultados!</div>
+  </div>
+  <div id="form-container" style="display:none">
+
+    <!-- NOMBRE -->
+    <div class="section-title">👤 Quién sos</div>
+    <div class="card nombre-card">
+      <div class="card-inner">
+        <label class="q-label">Tu nombre</label>
+        <input type="text" id="nombre" placeholder="Escribí tu nombre..." maxlength="30">
+      </div>
+    </div>
+
+    <!-- ═══ BLOQUE 1: PREDICCIONES DEL TORNEO ═══ -->
+    <div class="section-title">🌍 El torneo completo</div>
+
+    <!-- P1: Goles totales mundial -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 1 · Predicción numérica</span>
+        <div class="q-text">¿Cuántos goles en total va a haber en todo el Mundial 2026?</div>
+        <div class="q-hint">Contá desde la fase de grupos hasta la final. Son 104 partidos en total.</div>
+        <input type="number" id="p1" placeholder="Ej: 156" min="80" max="300">
+        <div class="pts-hint">Gana quien más se acerque · Proximidad acumulada</div>
+      </div>
+    </div>
+
+    <!-- P2: Goleador del torneo -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 2 · Predicción</span>
+        <div class="q-text">¿Quién va a ser el goleador del torneo?</div>
+        <div class="q-hint">Messi ya lleva 5. Mbappé tiene 14 históricos. Lautaro, Haaland, Vinicius... ¿quién termina arriba?</div>
+        <input type="text" id="p2" placeholder="Nombre del jugador..." maxlength="40">
+      </div>
+    </div>
+
+    <!-- P3: Goles Messi -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 3 · El 10</span>
+        <div class="q-text">¿Cuántos goles va a hacer Messi en todo el torneo?</div>
+        <div class="q-hint">Ya lleva 5 en la fase de grupos. Argentina tiene al menos 4 partidos más por delante si llega a la final.</div>
+        <input type="number" id="p3" placeholder="Ej: 9" min="5" max="20">
+        <div class="pts-hint">Gana quien más se acerque · Proximidad acumulada</div>
+      </div>
+    </div>
+
+    <!-- ═══ BLOQUE 2: LOS 16AVOS ═══ -->
+    <div class="section-title">⚔️ Los 16avos</div>
+
+    <!-- P4: Partidos por penales -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 4 · Predicción numérica</span>
+        <div class="q-text">¿Cuántos partidos de los 16avos se van a definir por penales?</div>
+        <div class="q-hint">Son 16 partidos en total. Si termina empatado al final del tiempo extra (30 min), va a penales.</div>
+        <input type="number" id="p4" placeholder="Ej: 3" min="0" max="16">
+        <div class="pts-hint">Gana quien más se acerque · Proximidad acumulada</div>
+      </div>
+    </div>
+
+    <!-- P5: Tarjetas rojas -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 5 · Predicción numérica</span>
+        <div class="q-text">¿Cuántas tarjetas rojas va a haber en los 16avos?</div>
+        <div class="q-hint">Son 16 partidos de eliminación directa, muy intensos. ¿Cuántos se van a ir a los vestuarios antes de tiempo?</div>
+        <input type="number" id="p5" placeholder="Ej: 4" min="0" max="30">
+        <div class="pts-hint">Gana quien más se acerque · Proximidad acumulada</div>
+      </div>
+    </div>
+
+    <!-- P6: Goles en 16avos -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 6 · Predicción numérica</span>
+        <div class="q-text">¿Cuántos goles en total en los 16avos?</div>
+        <div class="q-hint">Incluye los goles del tiempo extra, pero NO los penales. Son 16 partidos, ¡dale al número!</div>
+        <input type="number" id="p6" placeholder="Ej: 38" min="10" max="100">
+        <div class="pts-hint">Gana quien más se acerque · Proximidad acumulada</div>
+      </div>
+    </div>
+
+    <!-- P7: Más goleadora en 16avos -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 7 · Predicción</span>
+        <div class="q-text">¿Cuál selección va a ser la más goleadora en los 16avos?</div>
+        <div class="q-hint">La que más goles meta en su partido de 16avos (incluyendo tiempo extra, sin contar penales).</div>
+        <div class="selecciones-grid" id="grid-p7"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BLOQUE 3: ARGENTINA ═══ -->
+    <div class="section-title">🇦🇷 La Scaloneta</div>
+
+    <!-- P8: Minuto primer gol ARG -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 8 · Predicción numérica</span>
+        <div class="q-text">¿En qué minuto entra el primer gol de Argentina en 16avos?</div>
+        <div class="q-hint">Si Argentina no hace goles (improbable pero posible), esta pregunta queda nula y no puntúa.</div>
+        <input type="number" id="p8" placeholder="Ej: 23" min="1" max="120">
+        <div class="pts-hint">Gana quien más se acerque · Proximidad acumulada</div>
+      </div>
+    </div>
+
+    <!-- P9: Primer cambio Scaloni -->
+    <div class="card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 9 · El Profe</span>
+        <div class="q-text">¿Quién va a ingresar como primer cambio de Scaloni en el partido de Argentina?</div>
+        <div class="q-hint">El primer jugador que entra al campo después de que Scaloni hace el primer cambio del partido.</div>
+        <div id="jugadores-container"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BLOQUE 4: JUEGOS ESPECIALES ═══ -->
+    <div class="section-title">🎲 Juegos especiales</div>
+
+    <!-- P10: El último sobreviviente -->
+    <div class="card sobreviviente-card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 10 · El último sobreviviente 🏴‍☠️</span>
+        <div class="q-text">Elegí una selección. El que llegue más lejos, gana.</div>
+        <div class="sobreviviente-explain">
+          <strong>¿Cómo funciona?</strong> Cada uno elige una selección antes de los 16avos. 
+          A medida que tu selección pierde, quedás eliminado del juego. 
+          Si tu selección gana el Mundial, ganás vos. 
+          Si quedan varios con el mismo equipo final, se sortea.
+          <br><br>
+          <strong>Ojo:</strong> no podés cambiar tu selección una vez cerrado el juego.
+        </div>
+        <div class="selecciones-grid" id="grid-p10"></div>
+      </div>
+    </div>
+
+    <!-- P11: Se cae la bombacha -->
+    <div class="card bombacha-card">
+      <div class="card-inner">
+        <span class="q-label">Pregunta 11 · ¿A quién se le cae la bombacha? 💣</span>
+        <div class="q-text">¿Cuál selección favorita va a quedar eliminada antes de lo esperado?</div>
+        <div class="bombacha-hint-box">
+          <strong>¿Cómo funciona?</strong> Vos no elegís nada acá — <strong>la IA lo decide</strong>. 
+          Una vez cerrados los pronósticos, el organizador aprieta un botón y Claude elige al azar 
+          la selección que "se le cae la bombacha". La predicción se revela a todos al mismo tiempo. 
+          Gana el punto quien haya elegido en la Pregunta 10 (Último Sobreviviente) 
+          <strong>la misma selección que eligió la IA</strong>. 
+          <br><br>
+          🎰 Es puro azar. El organizador no puede controlarlo.
+        </div>
+        <div style="background: rgba(230,57,70,0.08); border-radius:6px; padding:14px; text-align:center; border: 1px solid rgba(230,57,70,0.2);">
+          <div style="font-size:32px; margin-bottom:6px">🔒</div>
+          <div style="font-size:13px; color:rgba(245,240,232,0.6); font-style:italic;">La IA lo revela cuando el organizador cierre los pronósticos</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ya-cargado" class="ya-cargado">
+      ⚠️ Ya cargaste tus pronósticos. Podés modificarlos hasta que se cierren.
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="guardar()">CARGAR PRONÓSTICOS</button>
+
+    <div id="success-banner" class="success-banner">
+      <div class="icon">🏆</div>
+      <div class="titulo">¡Pronósticos guardados!</div>
+      <div class="sub" id="success-sub">Tus pronósticos quedaron guardados. ¡Que gane el mejor!</div>
+    </div>
+
+  </div>
+  <div class="footer">Mundialeta Familiar 2026 · 16avos de Final</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBmh33yZbqoU_0oFO0dZ2ix55iOR3Zr-SQ",
+  authDomain: "reto-colapinto.firebaseapp.com",
+  projectId: "reto-colapinto",
+  storageBucket: "reto-colapinto.firebasestorage.app",
+  messagingSenderId: "990031033376",
+  appId: "1:990031033376:web:3c5b0b3c233b63edc124fd"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ── SELECCIONES ──
+const SELECCIONES = [
+  "🇦🇷 Argentina","🇧🇷 Brasil","🇫🇷 Francia","🇩🇪 Alemania","🇪🇸 España",
+  "🇲🇽 México","🇺🇸 USA","🇨🇴 Colombia","🇳🇴 Noruega","🇨🇭 Suiza",
+  "🇨🇦 Canadá","🇧🇦 Bosnia","🇲🇦 Marruecos","🇧🇪 Bélgica","🇸🇳 Senegal",
+  "🇿🇦 Sudáfrica","🇪🇨 Ecuador","🇵🇾 Paraguay","🇸🇪 Suecia","🏴󠁧󠁢󠁥󠁮󠁧󠁿 Inglaterra",
+  "🇵🇹 Portugal","🇳🇱 Países Bajos","🇭🇷 Croacia","🇺🇾 Uruguay","🇯🇵 Japón",
+  "🇰🇷 Corea del Sur","🇦🇺 Australia","🇹🇷 Turquía","🇬🇭 Ghana","🇮🇷 Irán",
+  "🇪🇬 Egipto","🇸🇦 Arabia Saudita"
+];
+
+// ── JUGADORES ARGENTINA ──
+const JUGADORES = {
+  "Arqueros": ["Dibu Martínez","Rulli","Musso"],
+  "Defensores": ["Montiel","Molina","Lisandro Martínez","Otamendi","Senesi","Cuti Romero","Tagliafico","Medina"],
+  "Mediocampistas": ["Paredes","Mac Allister","De Paul","Lo Celso","Palacios","Enzo Fernández","Barco","Almada","Nico Paz"],
+  "Delanteros": ["Messi","Julián Álvarez","Lautaro","Nico González","Giuliano Simeone","López"]
+};
+
+window.selecciones_state = { p7: null, p10: null };
+window.jugador_p9 = null;
+
+// Renderizar grillas de selecciones
+function renderGrid(containerId, stateKey, colorClass) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  SELECCIONES.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'selec-btn';
+    btn.textContent = s;
+    btn.onclick = () => {
+      window.selecciones_state[stateKey] = s;
+      container.querySelectorAll('.selec-btn').forEach(b => b.classList.remove('active','sobreviviente-active'));
+      btn.classList.add(colorClass || 'active');
+    };
+    container.appendChild(btn);
+  });
+}
+
+// Renderizar jugadores Argentina
+function renderJugadores() {
+  const container = document.getElementById('jugadores-container');
+  container.innerHTML = '';
+  Object.entries(JUGADORES).forEach(([pos, jugadores]) => {
+    const posLabel = document.createElement('div');
+    posLabel.className = 'pos-label';
+    posLabel.textContent = pos;
+    container.appendChild(posLabel);
+    const grid = document.createElement('div');
+    grid.className = 'jugador-grid';
+    jugadores.forEach(j => {
+      const btn = document.createElement('button');
+      btn.className = 'jugador-btn';
+      btn.innerHTML = `<span class="jugador-pos">${pos.slice(0,-1)}</span>${j}`;
+      btn.onclick = () => {
+        window.jugador_p9 = j;
+        document.querySelectorAll('.jugador-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      };
+      grid.appendChild(btn);
+    });
+    container.appendChild(grid);
+    const div = document.createElement('div');
+    div.className = 'divider';
+    container.appendChild(div);
+  });
+}
+
+renderGrid('grid-p7', 'p7', 'active');
+renderGrid('grid-p10', 'p10', 'sobreviviente-active');
+renderJugadores();
+
+async function init() {
+  try {
+    const configSnap = await getDoc(doc(db, 'config', 'juego16'));
+    const cerrado = configSnap.exists() && configSnap.data().cerrado === true;
+    document.getElementById('loading').style.display = 'none';
+    if (cerrado) {
+      document.getElementById('cerrado-banner').style.display = 'block';
+      return;
+    }
+    document.getElementById('form-container').style.display = 'block';
+    const nombreGuardado = localStorage.getItem('m16_nombre');
+    if (nombreGuardado) {
+      document.getElementById('nombre').value = nombreGuardado;
+      await cargarPrevio(nombreGuardado);
+    }
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-container').style.display = 'block';
+  }
+}
+
+async function cargarPrevio(nombre) {
+  try {
+    const id = nombre.toLowerCase().trim().replace(/\s+/g,'_');
+    const snap = await getDoc(doc(db, 'pronosticos16', id));
+    if (!snap.exists()) return;
+    const d = snap.data();
+    document.getElementById('ya-cargado').style.display = 'block';
+    if (d.p1) document.getElementById('p1').value = d.p1;
+    if (d.p2) document.getElementById('p2').value = d.p2;
+    if (d.p3) document.getElementById('p3').value = d.p3;
+    if (d.p4) document.getElementById('p4').value = d.p4;
+    if (d.p5) document.getElementById('p5').value = d.p5;
+    if (d.p6) document.getElementById('p6').value = d.p6;
+    if (d.p8) document.getElementById('p8').value = d.p8;
+    // Restaurar selección p7
+    if (d.p7) {
+      window.selecciones_state.p7 = d.p7;
+      document.querySelectorAll('#grid-p7 .selec-btn').forEach(b => {
+        if (b.textContent === d.p7) b.classList.add('active');
+      });
+    }
+    // Restaurar selección p10
+    if (d.p10) {
+      window.selecciones_state.p10 = d.p10;
+      document.querySelectorAll('#grid-p10 .selec-btn').forEach(b => {
+        if (b.textContent === d.p10) b.classList.add('sobreviviente-active');
+      });
+    }
+    // Restaurar jugador p9
+    if (d.p9) {
+      window.jugador_p9 = d.p9;
+      document.querySelectorAll('.jugador-btn').forEach(b => {
+        if (b.textContent.includes(d.p9)) b.classList.add('active');
+      });
+    }
+  } catch(e) {}
+}
+
+document.getElementById('nombre').addEventListener('blur', async function() {
+  const n = this.value.trim();
+  if (n) await cargarPrevio(n);
+});
+
+window.guardar = async function() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const p1 = parseInt(document.getElementById('p1').value);
+  const p2 = document.getElementById('p2').value.trim();
+  const p3 = parseInt(document.getElementById('p3').value);
+  const p4 = parseInt(document.getElementById('p4').value);
+  const p5 = parseInt(document.getElementById('p5').value);
+  const p6 = parseInt(document.getElementById('p6').value);
+  const p7 = window.selecciones_state.p7;
+  const p8 = parseInt(document.getElementById('p8').value);
+  const p9 = window.jugador_p9;
+  const p10 = window.selecciones_state.p10;
+
+  if (!nombre) { alert('Poné tu nombre!'); return; }
+  if (!p1 || p1 < 80) { alert('Completá cuántos goles en todo el Mundial (mínimo 80)'); return; }
+  if (!p2) { alert('Completá quién va a ser el goleador del torneo'); return; }
+  if (!p3 || p3 < 5) { alert('Completá cuántos goles hace Messi (ya lleva 5)'); return; }
+  if (isNaN(p4)) { alert('Completá cuántos partidos van a penales'); return; }
+  if (isNaN(p5)) { alert('Completá cuántas tarjetas rojas'); return; }
+  if (!p6 || p6 < 10) { alert('Completá cuántos goles en los 16avos'); return; }
+  if (!p7) { alert('Elegí la selección más goleadora en 16avos'); return; }
+  if (!p8 || p8 < 1) { alert('Completá el minuto del primer gol de Argentina'); return; }
+  if (!p9) { alert('Elegí el primer cambio de Scaloni'); return; }
+  if (!p10) { alert('Elegí tu selección para El Último Sobreviviente'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'GUARDANDO...';
+
+  try {
+    const id = nombre.toLowerCase().trim().replace(/\s+/g,'_');
+    await setDoc(doc(db, 'pronosticos16', id), {
+      nombre, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
+      timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('m16_nombre', nombre);
+    document.getElementById('success-banner').style.display = 'block';
+    document.getElementById('success-sub').innerHTML =
+      `<strong style="color:var(--crema)">${nombre}</strong>, tus pronósticos quedaron guardados.<br>¡Que gane el mejor! 🏆`;
+    btn.textContent = '✓ GUARDADO';
+    document.getElementById('ya-cargado').style.display = 'block';
+  } catch(e) {
+    alert('Error al guardar. Intentá de nuevo.');
+    btn.disabled = false;
+    btn.textContent = 'CARGAR PRONÓSTICOS';
+  }
+};
+
+init();
+</script>
+</body>
 </html>
