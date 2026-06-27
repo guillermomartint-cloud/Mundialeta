@@ -319,20 +319,13 @@
     <div class="card bombacha-card">
       <div class="card-inner">
         <span class="q-label">Pregunta 11 · ¿A quién se le cae la bombacha? 💣</span>
-        <div class="q-text">¿Cuál selección favorita va a quedar eliminada antes de lo esperado?</div>
+        <div class="q-text">¿A qué selección favorita creés que le va a caer la bombacha?</div>
         <div class="bombacha-hint-box">
-          <strong>¿Cómo funciona?</strong> Vos no elegís nada acá — <strong>la IA lo decide</strong>. 
-          Una vez cerrados los pronósticos, el organizador aprieta un botón y Claude elige al azar 
-          la selección que "se le cae la bombacha". La predicción se revela a todos al mismo tiempo. 
-          Gana el punto quien haya elegido en la Pregunta 10 (Último Sobreviviente) 
-          <strong>la misma selección que eligió la IA</strong>. 
+          <strong>¿Cómo funciona?</strong> Elegís la selección que creés que va a quedar eliminada sorpresivamente antes de lo esperado. Una vez cerrados los pronósticos, <strong>la IA elige una selección al azar</strong> — sin que nadie pueda controlarlo. <strong>El que haya elegido la misma que la IA, gana.</strong>
           <br><br>
-          🎰 Es puro azar. El organizador no puede controlarlo.
+          🎰 Es puro azar. El organizador no puede controlarlo ni ver el resultado hasta que lo revele para todos al mismo tiempo.
         </div>
-        <div style="background: rgba(230,57,70,0.08); border-radius:6px; padding:14px; text-align:center; border: 1px solid rgba(230,57,70,0.2);">
-          <div style="font-size:32px; margin-bottom:6px">🔒</div>
-          <div style="font-size:13px; color:rgba(245,240,232,0.6); font-style:italic;">La IA lo revela cuando el organizador cierre los pronósticos</div>
-        </div>
+        <div class="selecciones-grid" id="grid-p11"></div>
       </div>
     </div>
 
@@ -387,7 +380,7 @@ const JUGADORES = {
   "Delanteros": ["Messi","Julián Álvarez","Lautaro","Nico González","Giuliano Simeone","López"]
 };
 
-window.selecciones_state = { p7: null, p10: null };
+window.selecciones_state = { p7: null, p10: null, p11: null };
 window.jugador_p9 = null;
 
 // Renderizar grillas de selecciones
@@ -438,6 +431,7 @@ function renderJugadores() {
 
 renderGrid('grid-p7', 'p7', 'active');
 renderGrid('grid-p10', 'p10', 'sobreviviente-active');
+renderGrid('grid-p11', 'p11', 'active');
 renderJugadores();
 
 async function init() {
@@ -489,6 +483,13 @@ async function cargarPrevio(nombre) {
         if (b.textContent === d.p10) b.classList.add('sobreviviente-active');
       });
     }
+    // Restaurar selección p11
+    if (d.p11) {
+      window.selecciones_state.p11 = d.p11;
+      document.querySelectorAll('#grid-p11 .selec-btn').forEach(b => {
+        if (b.textContent === d.p11) b.classList.add('active');
+      });
+    }
     // Restaurar jugador p9
     if (d.p9) {
       window.jugador_p9 = d.p9;
@@ -516,6 +517,7 @@ window.guardar = async function() {
   const p8 = parseInt(document.getElementById('p8').value);
   const p9 = window.jugador_p9;
   const p10 = window.selecciones_state.p10;
+  const p11 = window.selecciones_state.p11;
 
   if (!nombre) { alert('Poné tu nombre!'); return; }
   if (!p1 || p1 < 80) { alert('Completá cuántos goles en todo el Mundial (mínimo 80)'); return; }
@@ -528,6 +530,7 @@ window.guardar = async function() {
   if (!p8 || p8 < 1) { alert('Completá el minuto del primer gol de Argentina'); return; }
   if (!p9) { alert('Elegí el primer cambio de Scaloni'); return; }
   if (!p10) { alert('Elegí tu selección para El Último Sobreviviente'); return; }
+  if (!p11) { alert('Elegí a quién se le cae la bombacha'); return; }
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
@@ -536,7 +539,7 @@ window.guardar = async function() {
   try {
     const id = nombre.toLowerCase().trim().replace(/\s+/g,'_');
     await setDoc(doc(db, 'pronosticos16', id), {
-      nombre, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
+      nombre, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11,
       timestamp: new Date().toISOString()
     });
     localStorage.setItem('m16_nombre', nombre);
