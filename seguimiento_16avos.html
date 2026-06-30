@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏆 Mundialeta 16avos — Seguimiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --verde: #1a472a; --verde-claro: #2d6a4f;
+    --dorado: #d4af37; --dorado-claro: #f0d060;
+    --crema: #f5f0e8; --gris: #8a9a8a;
+    --negro: #0a0f0a; --rojo: #e63946;
+    --card-bg: #162a1e; --card-border: rgba(212,175,55,0.15);
+  }
+  body { background: var(--negro); color: var(--crema); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+  .hero {
+    background: linear-gradient(160deg, #060d08 0%, var(--verde) 55%, #0d1f10 100%);
+    padding: 44px 20px 36px; text-align: center;
+    border-bottom: 3px solid var(--dorado); position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '16'; position: absolute;
+    font-family: 'Bebas Neue', sans-serif; font-size: 280px;
+    color: rgba(212,175,55,0.04); top: 50%; left: 50%;
+    transform: translate(-50%, -50%); pointer-events: none; letter-spacing: -10px;
+  }
+  .hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--dorado); margin-bottom: 10px; position: relative; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 11vw, 70px); line-height: 0.95; color: var(--crema); position: relative; }
+  .hero-title span { color: var(--dorado); }
+  .hero-sub { font-size: 12px; color: var(--gris); margin-top: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; position: relative; }
+  .hero-badge { display: inline-block; background: var(--dorado); color: var(--negro); font-size: 11px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; padding: 5px 14px; border-radius: 2px; margin-top: 14px; position: relative; }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 0 16px 60px; }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; color: var(--dorado);
+    margin: 36px 0 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--dorado), transparent); }
+
+  /* RESUMEN STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+  .stat-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px 8px; text-align: center; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--dorado); line-height: 1; }
+  .stat-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gris); margin-top: 4px; }
+
+  /* DISTRIBUCION CARD */
+  .distrib-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; margin-bottom: 10px; }
+  .distrib-titulo { font-size: 13px; font-weight: 700; color: var(--dorado-claro); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .distrib-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .distrib-label { font-size: 12px; font-weight: 600; color: var(--crema); width: 110px; flex-shrink: 0; }
+  .distrib-bar-wrap { flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; height: 20px; overflow: hidden; position: relative; }
+  .distrib-bar { height: 100%; background: linear-gradient(to right, var(--dorado), var(--dorado-claro)); border-radius: 4px; display: flex; align-items: center; padding-left: 6px; }
+  .distrib-count { font-size: 10px; font-weight: 700; color: var(--negro); }
+  .distrib-pct { font-size: 11px; color: var(--gris); width: 32px; text-align: right; flex-shrink: 0; }
+
+  /* TABLA NUMERICAS */
+  .num-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 16px; margin-bottom: 10px; }
+  .num-titulo { font-size: 13px; font-weight: 700; color: var(--dorado-claro); margin-bottom: 10px; }
+  .num-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+  .num-stat { text-align: center; background: rgba(255,255,255,0.03); border-radius: 4px; padding: 8px 4px; }
+  .num-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--crema); }
+  .num-stat-lbl { font-size: 8px; color: var(--gris); text-transform: uppercase; letter-spacing: 0.5px; }
+  .num-rango { font-size: 11px; color: var(--gris); text-align: center; }
+  .num-rango span { color: var(--dorado); font-weight: 700; }
+
+  /* RESULTADO REVELADO */
+  .resultado-box {
+    background: linear-gradient(135deg, rgba(230,57,70,0.12), rgba(230,57,70,0.04));
+    border: 2px solid rgba(230,57,70,0.4); border-radius: 8px;
+    padding: 20px; margin-bottom: 16px; text-align: center;
+  }
+  .resultado-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--rojo); margin-bottom: 8px; }
+  .resultado-selec { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--rojo); letter-spacing: 1px; line-height: 1; margin-bottom: 10px; }
+  .resultado-explicacion { font-size: 12px; color: rgba(245,240,232,0.75); line-height: 1.6; font-style: italic; }
+  .resultado-ganadores { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(230,57,70,0.2); }
+  .resultado-ganadores-titulo { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gris); margin-bottom: 8px; }
+  .ganador-chip { display: inline-block; background: rgba(110,201,110,0.15); border: 1px solid rgba(110,201,110,0.3); color: #6ec96e; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 4px; margin: 2px; }
+
+  /* PARTICIPANTES LISTA */
+  .participante-row {
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px;
+    padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .participante-nombre { font-weight: 700; font-size: 13px; color: var(--crema); }
+  .participante-detalle { font-size: 11px; color: var(--gris); }
+
+  .nota-info {
+    background: rgba(212,175,55,0.06); border-left: 3px solid var(--dorado);
+    border-radius: 0 6px 6px 0; padding: 12px 14px; margin-top: 8px;
+    font-size: 12px; color: rgba(245,240,232,0.7); line-height: 1.5;
+  }
+  .nota-info strong { color: var(--dorado-claro); }
+
+  .toggle-detalle-btn {
+    width: 100%; padding: 14px; background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 6px; color: var(--dorado); font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+    letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .toggle-detalle-btn:hover { background: rgba(212,175,55,0.18); }
+  .toggle-detalle-btn .arrow { transition: transform 0.2s; }
+  .toggle-detalle-btn.open .arrow { transform: rotate(180deg); }
+
+  .detalle-section { display: none; }
+  .detalle-section.visible { display: block; }
+
+  .pron-item-detail {
+    background: var(--card-bg); border-radius: 6px; padding: 14px;
+    border: 1px solid var(--card-border); margin-bottom: 8px;
+  }
+  .pron-item-detail .pron-nombre { font-weight: 700; font-size: 15px; color: var(--dorado-claro); margin-bottom: 8px; }
+  .pron-item-detail .pron-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .pron-item-detail .pron-dato { font-size: 11px; color: rgba(245,240,232,0.65); }
+  .pron-item-detail .pron-dato span { color: var(--crema); font-weight: 600; }
+  .pron-item-detail .pron-bombacha {
+    grid-column: span 2; border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 6px; margin-top: 4px; font-size: 11px; color: rgba(245,240,232,0.65);
+  }
+  .pron-item-detail .pron-bombacha span { color: #e84060; font-weight: 700; }
+
+  .footer { text-align: center; padding: 24px 0 0; font-size: 11px; color: var(--gris); letter-spacing: 1px; }
+
+  .actualiza-badge {
+    text-align: center; font-size: 11px; color: var(--gris);
+    background: rgba(255,255,255,0.03); border-radius: 4px; padding: 8px;
+    margin-bottom: 8px; letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Mundialeta Familiar · Mundial 2026</div>
+  <div class="hero-title">Seguimiento <span>16avos</span></div>
+  <div class="hero-sub">Cómo viene la mano</div>
+  <div class="hero-badge">19 pronósticos cargados</div>
+</div>
+
+<div class="container">
+
+  <div class="actualiza-badge">📅 Última actualización: 30 de junio · Pronósticos cerrados</div>
+
+  <button class="toggle-detalle-btn" id="btn-detalle" onclick="toggleDetalle()">
+    <span>📋 VER TODOS LOS PRONÓSTICOS</span>
+    <span class="arrow">▼</span>
+  </button>
+
+  <!-- RESUMEN -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-num">19</div>
+      <div class="stat-label">Participantes</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">11</div>
+      <div class="stat-label">Preguntas</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">16</div>
+      <div class="stat-label">Partidos en juego</div>
+    </div>
+  </div>
+
+  <!-- LA BOMBACHA -->
+  <div class="section-title">💣 La Bombacha</div>
+  <div class="resultado-box">
+    <div class="resultado-label">🎰 Se le cae la bombacha a...</div>
+    <div class="resultado-selec">🇵🇹 PORTUGAL</div>
+    <div class="resultado-explicacion">"Llegaron con Cristiano en modo Dios, la prensa los puso en la final antes de jugar, y se van a quedar sin nafta justo cuando más la necesitan. La bombacha les cae en cuartos, con gol en contra incluido. Dixit la IA."</div>
+    <div class="resultado-ganadores">
+      <div class="resultado-ganadores-titulo">🎉 Acertaron (eligieron Portugal)</div>
+      <span class="ganador-chip">Ara</span>
+      <span class="ganador-chip">Guille</span>
+      <span class="ganador-chip">Guille posta</span>
+      <span class="ganador-chip">Verónica</span>
+    </div>
+  </div>
+
+  <!-- EL ÚLTIMO SOBREVIVIENTE -->
+  <div class="section-title">🏴‍☠️ El Último Sobreviviente</div>
+  <div class="distrib-card">
+    <div class="distrib-titulo">📊 Quién eligió qué selección</div>
+    <div class="distrib-row">
+      <div class="distrib-label">🇦🇷 Argentina</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:84%"><span class="distrib-count">16</span></div></div>
+      <div class="distrib-pct">84%</div>
+    </div>
+    <div class="distrib-row">
+      <div class="distrib-label">🇫🇷 Francia</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:16%"><span class="distrib-count">3</span></div></div>
+      <div class="distrib-pct">16%</div>
+    </div>
+    <div class="nota-info">
+      <strong>¡Casi todos van con Argentina!</strong> Solo Ara, Guille y Guille posta se jugaron por Francia. Si Argentina no gana el Mundial, esos 3 tienen mejor chance.
+    </div>
+  </div>
+
+  <!-- SELECCIÓN MÁS GOLEADORA EN 16AVOS -->
+  <div class="section-title">⚽ Más goleadora en 16avos</div>
+  <div class="distrib-card">
+    <div class="distrib-titulo">📊 Predicciones</div>
+    <div class="distrib-row">
+      <div class="distrib-label">🇦🇷 Argentina</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:53%"><span class="distrib-count">10</span></div></div>
+      <div class="distrib-pct">53%</div>
+    </div>
+    <div class="distrib-row">
+      <div class="distrib-label">🇫🇷 Francia</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:32%"><span class="distrib-count">6</span></div></div>
+      <div class="distrib-pct">32%</div>
+    </div>
+    <div class="distrib-row">
+      <div class="distrib-label">🇩🇪 Alemania</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:16%"><span class="distrib-count">3</span></div></div>
+      <div class="distrib-pct">16%</div>
+    </div>
+  </div>
+
+  <!-- GOLEADOR DEL TORNEO -->
+  <div class="section-title">🏆 Goleador del torneo</div>
+  <div class="distrib-card">
+    <div class="distrib-titulo">📊 Predicciones</div>
+    <div class="distrib-row">
+      <div class="distrib-label">Messi</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:79%"><span class="distrib-count">15</span></div></div>
+      <div class="distrib-pct">79%</div>
+    </div>
+    <div class="distrib-row">
+      <div class="distrib-label">Mbappé</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:21%"><span class="distrib-count">4</span></div></div>
+      <div class="distrib-pct">21%</div>
+    </div>
+  </div>
+
+  <!-- PRIMER CAMBIO SCALONI -->
+  <div class="section-title">🔄 Primer cambio de Scaloni</div>
+  <div class="distrib-card">
+    <div class="distrib-titulo">📊 Predicciones</div>
+    <div class="distrib-row">
+      <div class="distrib-label">Nico González</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:37%"><span class="distrib-count">7</span></div></div>
+      <div class="distrib-pct">37%</div>
+    </div>
+    <div class="distrib-row">
+      <div class="distrib-label">Lo Celso</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:21%"><span class="distrib-count">4</span></div></div>
+      <div class="distrib-pct">21%</div>
+    </div>
+    <div class="distrib-row">
+      <div class="distrib-label">Tagliafico</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:11%"><span class="distrib-count">2</span></div></div>
+      <div class="distrib-pct">11%</div>
+    </div>
+    <div class="distrib-row">
+      <div class="distrib-label">Otros (6)</div>
+      <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:32%"><span class="distrib-count">6</span></div></div>
+      <div class="distrib-pct">32%</div>
+    </div>
+    <div class="nota-info">Almada, De Paul, Julián Álvarez, Mac Allister, Palacios y Paredes recibieron 1 voto cada uno.</div>
+  </div>
+
+  <!-- PREGUNTAS NUMÉRICAS -->
+  <div class="section-title">🔢 Predicciones numéricas</div>
+
+  <div class="num-card">
+    <div class="num-titulo">⚽ Goles totales del Mundial 2026</div>
+    <div class="num-stats">
+      <div class="num-stat"><div class="num-stat-val">81</div><div class="num-stat-lbl">Mínimo</div></div>
+      <div class="num-stat"><div class="num-stat-val">258</div><div class="num-stat-lbl">Promedio</div></div>
+      <div class="num-stat"><div class="num-stat-val">445</div><div class="num-stat-lbl">Máximo</div></div>
+    </div>
+    <div class="num-rango">Rango de apuestas: <span>81 (Jorge) a 445 (Marta)</span></div>
+  </div>
+
+  <div class="num-card">
+    <div class="num-titulo">🐐 Goles de Messi en el torneo</div>
+    <div class="num-stats">
+      <div class="num-stat"><div class="num-stat-val">7</div><div class="num-stat-lbl">Mínimo</div></div>
+      <div class="num-stat"><div class="num-stat-val">11</div><div class="num-stat-lbl">Promedio</div></div>
+      <div class="num-stat"><div class="num-stat-val">16</div><div class="num-stat-lbl">Máximo</div></div>
+    </div>
+    <div class="num-rango">El más optimista es <span>Mabel con 16</span>, ya lleva 5 hasta ahora</div>
+  </div>
+
+  <div class="num-card">
+    <div class="num-titulo">🥅 Partidos por penales en 16avos</div>
+    <div class="num-stats">
+      <div class="num-stat"><div class="num-stat-val">3</div><div class="num-stat-lbl">Mínimo</div></div>
+      <div class="num-stat"><div class="num-stat-val">4.7</div><div class="num-stat-lbl">Promedio</div></div>
+      <div class="num-stat"><div class="num-stat-val">9</div><div class="num-stat-lbl">Máximo</div></div>
+    </div>
+    <div class="num-rango">Mabel apostó fuerte con <span>9 partidos a penales</span></div>
+  </div>
+
+  <div class="num-card">
+    <div class="num-titulo">🟥 Tarjetas rojas en 16avos</div>
+    <div class="num-stats">
+      <div class="num-stat"><div class="num-stat-val">1</div><div class="num-stat-lbl">Mínimo</div></div>
+      <div class="num-stat"><div class="num-stat-val">4.7</div><div class="num-stat-lbl">Promedio</div></div>
+      <div class="num-stat"><div class="num-stat-val">16</div><div class="num-stat-lbl">Máximo</div></div>
+    </div>
+    <div class="num-rango">Verónica fue al frente con <span>16 rojas</span>, casi una por partido</div>
+  </div>
+
+  <div class="num-card">
+    <div class="num-titulo">⚽ Goles totales en los 16avos</div>
+    <div class="num-stats">
+      <div class="num-stat"><div class="num-stat-val">23</div><div class="num-stat-lbl">Mínimo</div></div>
+      <div class="num-stat"><div class="num-stat-val">36.4</div><div class="num-stat-lbl">Promedio</div></div>
+      <div class="num-stat"><div class="num-stat-val">53</div><div class="num-stat-lbl">Máximo</div></div>
+    </div>
+    <div class="num-rango">Mabel y Gaby empatan arriba de todos con <span>53 goles</span></div>
+  </div>
+
+  <div class="num-card">
+    <div class="num-titulo">🇦🇷 Minuto del primer gol de Argentina</div>
+    <div class="num-stats">
+      <div class="num-stat"><div class="num-stat-val">7</div><div class="num-stat-lbl">Mínimo</div></div>
+      <div class="num-stat"><div class="num-stat-val">21.5</div><div class="num-stat-lbl">Promedio</div></div>
+      <div class="num-stat"><div class="num-stat-val">39</div><div class="num-stat-lbl">Máximo</div></div>
+    </div>
+    <div class="num-rango">Fran Maro apostó a un gol tempranero, <span>minuto 7</span></div>
+  </div>
+
+  <!-- LISTA COMPLETA DETALLADA -->
+  <div class="section-title">📋 Los 19 participantes</div>
+  <div id="detalle-section" class="detalle-section">
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Ale P</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>275</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>11</span></div>
+        <div class="pron-dato">Penales: <span>6</span></div>
+        <div class="pron-dato">Rojas: <span>3</span></div>
+        <div class="pron-dato">Goles 16avos: <span>32</span></div>
+        <div class="pron-dato">Más goleadora: <span>Alemania</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>15</span></div>
+        <div class="pron-dato">1er cambio: <span>Almada</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>España</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Ara</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>275</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>11</span></div>
+        <div class="pron-dato">Penales: <span>4</span></div>
+        <div class="pron-dato">Rojas: <span>2</span></div>
+        <div class="pron-dato">Goles 16avos: <span>34</span></div>
+        <div class="pron-dato">Más goleadora: <span>Alemania</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>30</span></div>
+        <div class="pron-dato">1er cambio: <span>Nico González</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Francia</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Portugal ✓</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Blanca</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>166</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>14</span></div>
+        <div class="pron-dato">Penales: <span>6</span></div>
+        <div class="pron-dato">Rojas: <span>3</span></div>
+        <div class="pron-dato">Goles 16avos: <span>33</span></div>
+        <div class="pron-dato">Más goleadora: <span>Portugal</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>35</span></div>
+        <div class="pron-dato">1er cambio: <span>Tagliafico</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>España</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Cristian</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>259</span></div>
+        <div class="pron-dato">Goleador: <span>Mbappe</span></div>
+        <div class="pron-dato">Goles Messi: <span>11</span></div>
+        <div class="pron-dato">Penales: <span>5</span></div>
+        <div class="pron-dato">Rojas: <span>7</span></div>
+        <div class="pron-dato">Goles 16avos: <span>33</span></div>
+        <div class="pron-dato">Más goleadora: <span>Francia</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>17</span></div>
+        <div class="pron-dato">1er cambio: <span>Lo Celso</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Brasil</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Florencia</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>312</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>11</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>2</span></div>
+        <div class="pron-dato">Goles 16avos: <span>23</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>32</span></div>
+        <div class="pron-dato">1er cambio: <span>Otamendi</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Uruguay</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Fran Maro</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>185</span></div>
+        <div class="pron-dato">Goleador: <span>Lionel Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>10</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>2</span></div>
+        <div class="pron-dato">Goles 16avos: <span>28</span></div>
+        <div class="pron-dato">Más goleadora: <span>Alemania</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>7</span></div>
+        <div class="pron-dato">1er cambio: <span>Nico González</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Brasil</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Japón</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Gaby</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>325</span></div>
+        <div class="pron-dato">Goleador: <span>Mbappe</span></div>
+        <div class="pron-dato">Goles Messi: <span>14</span></div>
+        <div class="pron-dato">Penales: <span>4</span></div>
+        <div class="pron-dato">Rojas: <span>6</span></div>
+        <div class="pron-dato">Goles 16avos: <span>53</span></div>
+        <div class="pron-dato">Más goleadora: <span>Francia</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>9</span></div>
+        <div class="pron-dato">1er cambio: <span>Julián Álvarez</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Cabo Verde</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Guille</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>203</span></div>
+        <div class="pron-dato">Goleador: <span>Mbappé</span></div>
+        <div class="pron-dato">Goles Messi: <span>9</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>2</span></div>
+        <div class="pron-dato">Goles 16avos: <span>36</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>23</span></div>
+        <div class="pron-dato">1er cambio: <span>Nico González</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Francia</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Portugal ✓</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Guille posta</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>291</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>9</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>3</span></div>
+        <div class="pron-dato">Goles 16avos: <span>38</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>23</span></div>
+        <div class="pron-dato">1er cambio: <span>Nico González</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Francia</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Portugal ✓</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Joaco</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>156</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>10</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>1</span></div>
+        <div class="pron-dato">Goles 16avos: <span>39</span></div>
+        <div class="pron-dato">Más goleadora: <span>Alemania</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>39</span></div>
+        <div class="pron-dato">1er cambio: <span>De Paul</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>España</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Jorge Martin</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>81</span></div>
+        <div class="pron-dato">Goleador: <span>Mbape</span></div>
+        <div class="pron-dato">Goles Messi: <span>10</span></div>
+        <div class="pron-dato">Penales: <span>5</span></div>
+        <div class="pron-dato">Rojas: <span>6</span></div>
+        <div class="pron-dato">Goles 16avos: <span>38</span></div>
+        <div class="pron-dato">Más goleadora: <span>Francia</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>19</span></div>
+        <div class="pron-dato">1er cambio: <span>Nico González</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Brasil</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Liliana</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>195</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>107</span></div>
+        <div class="pron-dato">Penales: <span>7</span></div>
+        <div class="pron-dato">Rojas: <span>5</span></div>
+        <div class="pron-dato">Goles 16avos: <span>25</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>14</span></div>
+        <div class="pron-dato">1er cambio: <span>Palacios</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>México</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Luis</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>305</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>8</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>13</span></div>
+        <div class="pron-dato">Goles 16avos: <span>35</span></div>
+        <div class="pron-dato">Más goleadora: <span>Francia</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>33</span></div>
+        <div class="pron-dato">1er cambio: <span>Lo Celso</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Brasil</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Mabel</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>253</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>16</span></div>
+        <div class="pron-dato">Penales: <span>9</span></div>
+        <div class="pron-dato">Rojas: <span>8</span></div>
+        <div class="pron-dato">Goles 16avos: <span>53</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>12</span></div>
+        <div class="pron-dato">1er cambio: <span>Tagliafico</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Croacia</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Mariel</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>312</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>15</span></div>
+        <div class="pron-dato">Penales: <span>5</span></div>
+        <div class="pron-dato">Rojas: <span>3</span></div>
+        <div class="pron-dato">Goles 16avos: <span>34</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>9</span></div>
+        <div class="pron-dato">1er cambio: <span>Lo Celso</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Alemania</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Marta</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>445</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>12</span></div>
+        <div class="pron-dato">Penales: <span>4</span></div>
+        <div class="pron-dato">Rojas: <span>2</span></div>
+        <div class="pron-dato">Goles 16avos: <span>44</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>19</span></div>
+        <div class="pron-dato">1er cambio: <span>Mac Allister</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Brasil</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Santiago Ochoa</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>120</span></div>
+        <div class="pron-dato">Goleador: <span>Lionel Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>7</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>3</span></div>
+        <div class="pron-dato">Goles 16avos: <span>25</span></div>
+        <div class="pron-dato">Más goleadora: <span>Francia</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>20</span></div>
+        <div class="pron-dato">1er cambio: <span>Nico González</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Brasil</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Valentina Moretti</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>326</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>12</span></div>
+        <div class="pron-dato">Penales: <span>3</span></div>
+        <div class="pron-dato">Rojas: <span>2</span></div>
+        <div class="pron-dato">Goles 16avos: <span>40</span></div>
+        <div class="pron-dato">Más goleadora: <span>Francia</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>17</span></div>
+        <div class="pron-dato">1er cambio: <span>Paredes</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Inglaterra</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Verónica</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>314</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>11</span></div>
+        <div class="pron-dato">Penales: <span>4</span></div>
+        <div class="pron-dato">Rojas: <span>16</span></div>
+        <div class="pron-dato">Goles 16avos: <span>46</span></div>
+        <div class="pron-dato">Más goleadora: <span>Argentina</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>16</span></div>
+        <div class="pron-dato">1er cambio: <span>Lo Celso</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>Portugal ✓</span></div>
+      </div>
+    </div>
+
+    <div class="pron-item-detail">
+      <div class="pron-nombre">Yanina</div>
+      <div class="pron-grid">
+        <div class="pron-dato">Goles mundial: <span>205</span></div>
+        <div class="pron-dato">Goleador: <span>Messi</span></div>
+        <div class="pron-dato">Goles Messi: <span>14</span></div>
+        <div class="pron-dato">Penales: <span>4</span></div>
+        <div class="pron-dato">Rojas: <span>3</span></div>
+        <div class="pron-dato">Goles 16avos: <span>36</span></div>
+        <div class="pron-dato">Más goleadora: <span>Francia</span></div>
+        <div class="pron-dato">Min. gol ARG: <span>25</span></div>
+        <div class="pron-dato">1er cambio: <span>Barco</span></div>
+        <div class="pron-dato">Sobreviviente: <span>Argentina</span></div>
+        <div class="pron-bombacha">💣 Bombacha: <span>España</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nota-info" style="margin-top:16px">
+    <strong>Nota:</strong> Se excluyó el pronóstico de prueba "Guille" duplicado por indicación del organizador. Quedan 19 pronósticos válidos para el cómputo final, aunque el sistema cuenta 20 cargas totales.
+  </div>
+
+  <div class="footer">Mundialeta Familiar 2026 · 16avos de Final · Seguimiento</div>
+</div>
+
+<script>
+  function toggleDetalle() {
+    const section = document.getElementById('detalle-section');
+    const btn = document.getElementById('btn-detalle');
+    const isOpen = section.style.display === 'block';
+    section.style.display = isOpen ? 'none' : 'block';
+    btn.classList.toggle('open', !isOpen);
+    btn.querySelector('span:first-child').textContent = isOpen ? '📋 VER TODOS LOS PRONÓSTICOS' : '📋 OCULTAR PRONÓSTICOS';
+  }
+</script>
+</body>
+</html>
